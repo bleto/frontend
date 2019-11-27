@@ -6,11 +6,11 @@
     <img
         :class="['image', { 'image--fab': fab }]"
         :src="image"
-        alt="picture">
+        alt="picture"
+        @onerror="imageLoadOnError">
 </template>
 
 <script>
-import { mapActions } from 'vuex';
 import { getImageData } from '~/model/multimedia';
 
 export default {
@@ -39,16 +39,16 @@ export default {
         };
     },
     methods: {
-        ...mapActions('validations', [
-            'onError',
-        ]),
         async getImageById() {
             await this.$axios.$get(`multimedia/${this.imageId}`, {
                 responseType: 'arraybuffer',
-            }).then((response) => this.onSuccess(response));
+            }).then((response) => this.onSuccess(response)).catch(this.imageLoadOnError);
         },
         onSuccess(response) {
             this.image = getImageData(response);
+        },
+        imageLoadOnError() {
+            this.image = require('~/assets/images/placeholders/template.svg'); // eslint-disable-line global-require, import/no-dynamic-require
         },
     },
 };

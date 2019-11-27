@@ -46,7 +46,7 @@ export default function ({
         }
 
         if (process.client) {
-            store.dispatch('alerts/addAlert', { type: 'error', message: dev ? message : msg });
+            store.dispatch('alerts/addAlert', { type: 'error', message: msg });
         }
         if (dev) console.error(errorResponse.response);
 
