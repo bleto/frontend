@@ -64,6 +64,7 @@ export default {
 
             if (templateId) {
                 const template = getMappedTemplateName(templates, templateId);
+
                 commit(types.SET_PRODUCT_TEMPLATE, template);
             }
 
@@ -82,12 +83,14 @@ export default {
     },
     getTemplates({ commit, rootState }) {
         const { authentication: { user: { language } } } = rootState;
+
         return this.app.$axios.$get(`${language}/templates?limit=5000&offset=0`).then(({ collection: templates }) => {
             commit(types.SET_TEMPLATES, templates);
         }).catch(onDefaultError);
     },
     getCategories({ commit, rootState }) {
         const { authentication: { user: { language } } } = rootState;
+
         return this.app.$axios.$get(`${language}/categories?limit=5000&offset=0`).then(({ collection: categories }) => {
             commit(types.SET_CATEGORIES, categories);
         }).catch(onDefaultError);
@@ -135,6 +138,7 @@ export default {
     }) {
         const { id } = state;
         const { authentication: { user: { language } } } = rootState;
+
         return this.app.$axios.$put(`${language}/products/${id}/draft/${attributeId}/value`, { value }).then(() => {
             dispatch('applyDraft', {
                 id,
@@ -142,7 +146,7 @@ export default {
             });
         }).catch(onDefaultError);
     },
-    createProduct(
+    async createProduct(
         { commit, rootState },
         {
             data,
@@ -151,12 +155,15 @@ export default {
         },
     ) {
         const { authentication: { user: { language } } } = rootState;
-        return this.app.$axios.$post(`${language}/products`, data).then(({ id }) => {
+
+        await this.$setLoader('footerButton');
+        await this.app.$axios.$post(`${language}/products`, data).then(({ id }) => {
             commit(types.SET_PRODUCT_ID, id);
             onSuccess(id);
         }).catch((e) => onError(e.data));
+        await this.$removeLoader('footerButton');
     },
-    applyDraft(
+    async applyDraft(
         { rootState },
         {
             id,
@@ -164,9 +171,12 @@ export default {
         },
     ) {
         const { authentication: { user: { language } } } = rootState;
-        return this.app.$axios.$put(`${language}/products/${id}/draft/persist`, {}).then(() => onSuccess()).catch(onDefaultError);
+
+        await this.$setLoader('footerDraftButton');
+        await this.app.$axios.$put(`${language}/products/${id}/draft/persist`, {}).then(() => onSuccess()).catch(onDefaultError);
+        await this.$removeLoader('footerDraftButton');
     },
-    updateProduct(
+    async updateProduct(
         { rootState },
         {
             id,
@@ -175,11 +185,15 @@ export default {
         },
     ) {
         const { authentication: { user: { language } } } = rootState;
-        return this.app.$axios.$put(`${language}/products/${id}`, data).then(onSuccess).catch(onDefaultError);
+
+        await this.$setLoader('footerButton');
+        await this.app.$axios.$put(`${language}/products/${id}`, data).then(onSuccess).catch(onDefaultError);
+        await this.$removeLoader('footerButton');
     },
     removeProduct({ state, rootState }, { onSuccess }) {
         const { id } = state;
         const { language: userLanguageCode } = rootState.authentication.user;
+
         return this.app.$axios.$delete(`${userLanguageCode}/products/${id}`).then(() => onSuccess()).catch(onDefaultError);
     },
     clearStorage: ({ commit }) => {

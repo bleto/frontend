@@ -20,6 +20,11 @@ export const pages = [
                 path: 'activity-log-grid',
                 component: GridTabs.UserActivityLogsGridTab,
             },
+            {
+                name: 'profile-privileges-grid',
+                path: 'privileges-grid',
+                component: GridTabs.UserPrivilegesGridTab,
+            },
         ],
     },
     {
@@ -182,6 +187,11 @@ export const pages = [
                 name: 'product-edit-id-comments',
                 path: 'comments',
                 component: Tabs.ProductCommentsTab,
+            },
+            {
+                name: 'product-edit-id-history',
+                path: 'history',
+                component: GridTabs.ProductHistoryGridTab,
             },
         ],
         meta: {

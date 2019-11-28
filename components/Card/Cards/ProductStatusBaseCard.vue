@@ -19,7 +19,7 @@
                 :value="isDefaultStatus"
                 @input="setStatusAsDefault" />
             <span class="font--medium-12-16">
-                Status for new product in the system
+                The starting status
             </span>
         </div>
         <ColorPicker
@@ -90,7 +90,6 @@ export default {
         grid-gap: 8px;
 
         &__badge {
-            border-radius: 7px;
             display: flex;
             justify-content: center;
             align-items: center;

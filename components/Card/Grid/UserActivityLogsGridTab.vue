@@ -7,9 +7,10 @@
         <template #content>
             <Grid
                 namespace="userActivityLogsGrid"
-                :route-edit="routeEdit"
+                :edit-route="editRoute"
                 :basic-filters="true"
                 :edit-column="false"
+                :select-column="false"
                 title="Activity logs" />
         </template>
         <template #footer>
@@ -65,9 +66,9 @@ export default {
         ...mapGetters('userActivityLogsGrid', {
             numberOfPages: 'numberOfPages',
         }),
-        routeEdit() {
+        editRoute() {
             return {
-                getData: '/profile/log',
+                path: '/profile/log',
                 name: 'users-logs-edit-id',
             };
         },
@@ -79,7 +80,7 @@ export default {
                 const number = Math.trunc(value);
 
                 if (number !== this.numberOfDisplayedElements) {
-                    this.changeNumberOfDisplayingElements({ number });
+                    this.changeNumberOfDisplayingElements(number);
                     this.getDataWrapper();
                 }
             },
@@ -96,12 +97,7 @@ export default {
             this.getDataWrapper();
         },
         getDataWrapper() {
-            const { getData: path } = this.routeEdit;
-            this.getData(
-                {
-                    path,
-                },
-            );
+            this.getData(this.editRoute.path);
         },
     },
     async fetch({ app, store }) {
@@ -111,7 +107,7 @@ export default {
             store,
         });
         const gridPath = '/profile/log';
-        await store.dispatch('userActivityLogsGrid/getData', { path: gridPath });
+        await store.dispatch('userActivityLogsGrid/getData', gridPath);
     },
 };
 </script>

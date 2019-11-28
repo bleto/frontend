@@ -6,13 +6,12 @@
     <ResponsiveCenteredViewTemplate>
         <template #content>
             <Grid
-                namespace="categoryTreesGrid"
+                namespace="productHistoryGrid"
                 :edit-route="editRoute"
-                :editing-privilege-allowed="$hasAccess(['CATEGORY_TREE_UPDATE'])"
                 :basic-filters="true"
+                :edit-column="false"
                 :select-column="false"
-                title="Category trees"
-                @rowEdit="onRowEdit" />
+                title="Product history" />
         </template>
         <template #footer>
             <GridPageSelector
@@ -32,7 +31,7 @@ import gridModule from '~/reusableStore/grid/state';
 import ResponsiveCenteredViewTemplate from '~/components/Layout/ResponsiveCenteredViewTemplate';
 
 export default {
-    name: 'CategoryTreesGridTab',
+    name: 'ProductHistoryGridTab',
     components: {
         ResponsiveCenteredViewTemplate,
         Grid: () => import('~/components/Grid/Grid'),
@@ -48,29 +47,31 @@ export default {
     beforeCreate() {
         this.$registerStore({
             module: gridModule,
-            moduleName: 'categoryTreesGrid',
+            moduleName: 'productHistoryGrid',
             store: this.$store,
         });
     },
     beforeDestroy() {
-        this.$store.unregisterModule('categoryTreesGrid');
+        this.$store.unregisterModule('productHistoryGrid');
     },
     computed: {
         ...mapState('authentication', {
             userLanguageCode: (state) => state.user.language,
         }),
-        ...mapState('categoryTreesGrid', {
+        ...mapState('productHistoryGrid', {
             numberOfDataElements: (state) => state.count,
             currentPage: (state) => state.currentPage,
             numberOfDisplayedElements: (state) => state.numberOfDisplayedElements,
         }),
-        ...mapGetters('categoryTreesGrid', {
+        ...mapGetters('productHistoryGrid', {
             numberOfPages: 'numberOfPages',
         }),
         editRoute() {
+            const { params: { id } } = this.$route;
+
             return {
-                path: `${this.userLanguageCode}/trees`,
-                name: 'category-tree-edit-id',
+                path: `${this.userLanguageCode}/products/${id}/history`,
+                name: '',
             };
         },
         visibleRowsInPageCount: {
@@ -81,24 +82,18 @@ export default {
                 const number = Math.trunc(value);
 
                 if (number !== this.numberOfDisplayedElements) {
-                    this.changeNumberOfDisplayingElements(number);
+                    this.changeNumberOfDisplayingElements({ number });
                     this.getDataWrapper();
                 }
             },
         },
     },
     methods: {
-        ...mapActions('categoryTreesGrid', [
+        ...mapActions('productHistoryGrid', [
             'getData',
             'setCurrentPage',
             'changeNumberOfDisplayingElements',
         ]),
-        onRowEdit({ links: { edit } }) {
-            const args = edit.href.split('/');
-            const lastIndex = args.length - 1;
-
-            this.$router.push({ name: 'category-tree-edit-id-general', params: { id: args[lastIndex] } });
-        },
         onPageChanged(page) {
             this.setCurrentPage(page);
             this.getDataWrapper();
@@ -107,15 +102,16 @@ export default {
             this.getData(this.editRoute.path);
         },
     },
-    async fetch({ app, store }) {
-        const gridPath = `${store.state.authentication.user.language}/trees`;
-
+    async fetch({ app, store, params }) {
         app.$registerStore({
             module: gridModule,
-            moduleName: 'categoryTreesGrid',
+            moduleName: 'productHistoryGrid',
             store,
         });
-        await store.dispatch('categoryTreesGrid/getData', gridPath);
+        const { id } = params;
+        const gridPath = `${store.state.authentication.user.language}/products/${id}/history`;
+
+        await store.dispatch('productHistoryGrid/getData', gridPath);
     },
 };
 </script>
