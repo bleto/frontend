@@ -37,7 +37,7 @@ export default {
     getProductDraft({ commit }, { languageCode, id }) {
         commit(types.SET_DRAFT_LANGUAGE_CODE, languageCode);
 
-        return this.app.$axios.$get(`${languageCode}/products/${id}/draft`).then((draft) => {
+        return this.app.$axios.$get(`${languageCode}/products/${id}`).then((draft) => {
             commit(types.SET_PRODUCT_DRAFT, draft);
         }).catch(onDefaultError);
     },
@@ -99,7 +99,7 @@ export default {
         id,
         languageCode,
     }) {
-        return this.app.$axios.$get(`${languageCode}/products/${id}/draft/completeness`).then((completeness) => {
+        return this.app.$axios.$get(`${languageCode}/products/${id}/completeness`).then((completeness) => {
             commit(types.SET_PRODUCT_COMPLETENESS, completeness);
         }).catch(onDefaultError);
     },
@@ -119,7 +119,7 @@ export default {
             (element) => element.id === attributeId,
         );
 
-        await this.app.$axios.$put(`${languageCode}/products/${id}/draft/${attributeId}/value`, { value }).then(() => {
+        await this.app.$axios.$put(`${languageCode}/products/${id}/${attributeId}/value`, { value }).then(() => {
             commit(types.SET_PRODUCT_TEMPLATE_ELEMENT_VALUE, { index, value });
             // Update completeness only for required elements
             if (required) {
@@ -139,7 +139,7 @@ export default {
         const { id } = state;
         const { authentication: { user: { language } } } = rootState;
 
-        return this.app.$axios.$put(`${language}/products/${id}/draft/${attributeId}/value`, { value }).then(() => {
+        return this.app.$axios.$put(`${language}/products/${id}/${attributeId}/value`, { value }).then(() => {
             dispatch('applyDraft', {
                 id,
                 onSuccess,
