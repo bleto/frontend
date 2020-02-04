@@ -84,9 +84,9 @@ module.exports = {
                 },
             },
         },
-        hardSource: true, // TODO: check if it works correctly
+        // hardSource: true, // TODO: check if it works correctly
         // extractCSS: true, //TODO: check webpack CSS plugins for optimize files
-        // optimizeCSS: true,
+        // optimizeCSS: true, // TODO:
         extend(config, { isDev, isClient }) {
             const alias = config.resolve.alias || {};
             const { aliases = {} } = modulesConfig.nuxt;
@@ -119,7 +119,7 @@ module.exports = {
             //     }
             // });
         },
-        optimization: {
+        optimization: { // TODO: remove inactive modules from chunks
             runtimeChunk: 'single',
             minimize: true,
             splitChunks: {

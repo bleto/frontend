@@ -28,8 +28,8 @@ const ModuleLoader = (() => {
             nuxt: {},
         },
         init() {
-            this.setModulesConfig(this._modules.active || []);
-            this.setInactiveModulesConfig(this._modules.inactive || []);
+            this.setModulesConfig(this._modules.active);
+            this.setInactiveModulesConfig(this._modules.inactive);
             this.checkRequiredModules();
             this.checkModuleRelations();
             if (isDev) this.inactiveModulesInfo();
@@ -37,7 +37,7 @@ const ModuleLoader = (() => {
         install(_Vue) {
             const { extendComponents } = this._modulesConfig;
 
-            _Vue.prototype.$getComponentsForExtended = type => extendComponents[type];
+            _Vue.prototype.$getExtendedComponents = type => extendComponents[type];
         },
         get modulesConfig() {
             return this._modulesConfig;
@@ -50,12 +50,12 @@ const ModuleLoader = (() => {
             case 'local':
                 return require(`../modules/${path}`).default;
             case 'npm':
-                return require(`${path}`);
+                return require(`${path}`).default;
             default:
                 return null;
             }
         },
-        setModulesConfig(modules) {
+        setModulesConfig(modules = []) {
             this._modulesConfig = modules.reduce((acc, module) => {
                 const moduleName = module.replace('@ergo/', '');
                 const { path, type } = CORE_MODULES[module];
@@ -83,7 +83,7 @@ const ModuleLoader = (() => {
                             const { aliases } = config.nuxt;
 
                             Object.keys(aliases).forEach((alias) => {
-                                config.nuxt.aliases[alias] = `/${modulePath}${aliases[alias]}`;
+                                config.nuxt.aliases[alias] = `${type === 'local' ? '/' : ''}${modulePath}${aliases[alias]}`;
                             });
                         }
                         if (config.nuxt.css) {
@@ -153,10 +153,11 @@ const ModuleLoader = (() => {
                         modulesConfig.extendTabs.push(...config.extendTabs);
                     }
                 }
+                console.log(modulesConfig.nuxt.aliases);
                 return modulesConfig;
             }, this._modulesConfig);
         },
-        setInactiveModulesConfig(modules) {
+        setInactiveModulesConfig(modules = []) {
             this._inactiveModulesConfig = modules.reduce((acc, module) => {
                 const { path, type } = CORE_MODULES[module];
                 const config = this.configType(CORE_MODULES[module]);

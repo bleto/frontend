@@ -60,9 +60,9 @@ export const CORE_MODULES = {
         type: 'local',
         path: '@ergo/export',
     },
-    '@ergo/import': {
-        type: 'local',
-        path: '@ergo/import',
+    '@bleto/ergo-import': {
+        type: 'npm',
+        path: '@bleto/ergo-import',
     },
     '@ergo/conditions': {
         type: 'local',
